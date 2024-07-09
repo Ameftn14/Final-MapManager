@@ -6,11 +6,16 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MenuItem : MonoBehaviour, IDragHandler, IEndDragHandler {
+public class MenuItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler {
     [SerializeField] private string itemName;
     private Guid id;
     [SerializeField] private MenuSlot orignalSlot;
 
+    public void OnBeginDrag(PointerEventData eventData) {
+        // turn off raycasting
+        GetComponent<CanvasGroup>().blocksRaycasts = false;
+        orignalSlot.GetComponent<RectTransform>().SetAsLastSibling();
+    }
     public void OnDrag(PointerEventData eventData) {
         Debug.Log("OnDrag");
         transform.localPosition += (Vector3)eventData.delta;
@@ -18,8 +23,9 @@ public class MenuItem : MonoBehaviour, IDragHandler, IEndDragHandler {
 
     public void OnEndDrag(PointerEventData eventData) {
         Debug.Log("OnEndDrag");
+        GetComponent<CanvasGroup>().blocksRaycasts = true;
         // TODO if not accepted, return to start position
-        // transform.localPosition = startPosition;
+        transform.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
 
     public Guid GetID() {
@@ -50,4 +56,5 @@ public class MenuItem : MonoBehaviour, IDragHandler, IEndDragHandler {
     internal MenuSlot GetSlot() {
         return orignalSlot;
     }
+
 }
